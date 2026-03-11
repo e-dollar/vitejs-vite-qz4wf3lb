@@ -1,7 +1,7 @@
 import { useState, useRef, useEffect } from "react";
 
 const SYSTEM_PROMPT = "You are a helpful, witty assistant. Keep responses concise and conversational.";
-const API_KEY = "import.meta.env.VITE_OPENROUTER_API_KEY";
+const API_KEY = import.meta.env.VITE_OPENROUTER_API_KEY;
 const REFERER = "https://vitejs-vite-qz4wf3lb.vercel.app/";
 console.log("API KEY:", API_KEY);
 
