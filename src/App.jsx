@@ -1,7 +1,7 @@
 import { useState, useRef, useEffect } from "react";
 
 const SYSTEM_PROMPT = "You are a helpful, witty assistant. Keep responses concise and conversational.";
-const API_KEY = "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";
+const API_KEY = "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";
 const REFERER = "https://vitejs-vite-qz4wf3lb.vercel.app/";
 
 function TypingIndicator() {
