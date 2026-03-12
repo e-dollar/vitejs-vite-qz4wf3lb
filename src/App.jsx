@@ -75,7 +75,7 @@ export default function Chatbot() {
           "anthropic-dangerous-direct-browser-access": "true"
         },
         body: JSON.stringify({
-          model: "claude-3-5-sonnet-20241022",
+          model: "claude-sonnet-4-5",
           max_tokens: 2000,
           system: SYSTEM_PROMPT,
           tools: [{ type: "web_search_20250305", name: "web_search" }],
