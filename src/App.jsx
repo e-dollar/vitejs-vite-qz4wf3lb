@@ -69,7 +69,7 @@ export default function Chatbot() {
           "X-Title": "AI Assistant"
         },
         body: JSON.stringify({
-          model: "anthropic/claude-3.7-sonnet",
+          model: "google/gemini-2.0-pro-exp",
           messages: [
             { role: "system", content: SYSTEM_PROMPT },
             ...newMessages.map(m => ({ role: m.role, content: m.content }))
