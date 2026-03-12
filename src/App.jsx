@@ -1,8 +1,7 @@
 import { useState, useRef, useEffect } from "react";
 
-const SYSTEM_PROMPT = "You are a helpful, witty assistant. Keep responses concise and conversational.";
-const API_KEY = import.meta.env.VITE_OPENROUTER_API_KEY;
-const REFERER = "https://vitejs-vite-qz4wf3lb.vercel.app/";
+const SYSTEM_PROMPT = "You are a helpful, accurate assistant with access to web search. When asked about current events, people, companies, or anything that requires up-to-date information, always search the web first before answering. Be concise and conversational.";
+const API_KEY = import.meta.env.VITE_ANTHROPIC_API_KEY;
 
 function TypingIndicator() {
   return (
@@ -37,17 +36,18 @@ function Avatar({ role }) {
 
 export default function Chatbot() {
   const [messages, setMessages] = useState([
-    { role: "assistant", content: "Hello! I'm your AI assistant. How can I help you today?" }
+    { role: "assistant", content: "Hello! I can search the web to give you accurate, up-to-date answers. What would you like to know?" }
   ]);
   const [input, setInput] = useState("");
   const [loading, setLoading] = useState(false);
+  const [statusText, setStatusText] = useState("");
   const bottomRef = useRef(null);
   const inputRef = useRef(null);
   const textareaRef = useRef(null);
 
   useEffect(() => {
     bottomRef.current?.scrollIntoView({ behavior: "smooth" });
-  }, [messages, loading]);
+  }, [messages, loading, statusText]);
 
   async function sendMessage() {
     const text = input.trim();
@@ -58,44 +58,101 @@ export default function Chatbot() {
     setInput("");
     if (textareaRef.current) textareaRef.current.style.height = "24px";
     setLoading(true);
+    setStatusText("Thinking...");
 
     try {
-      const res = await fetch("https://openrouter.ai/api/v1/chat/completions", {
+      const apiMessages = newMessages.map(m => ({ role: m.role, content: m.content }));
+
+      // First call with web search tool
+      setStatusText("Searching the web...");
+      const res = await fetch("https://api.anthropic.com/v1/messages", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          "Authorization": `Bearer ${API_KEY}`,
-          "HTTP-Referer": REFERER,
-          "X-Title": "AI Assistant"
+          "x-api-key": API_KEY,
+          "anthropic-version": "2023-06-01",
+          "anthropic-beta": "interleaved-thinking-2025-05-14",
+          "anthropic-dangerous-direct-browser-access": "true"
         },
         body: JSON.stringify({
-          model: "google/gemini-2.0-pro-exp",
-          messages: [
-            { role: "system", content: SYSTEM_PROMPT },
-            ...newMessages.map(m => ({ role: m.role, content: m.content }))
-          ]
+          model: "claude-3-5-sonnet-20241022",
+          max_tokens: 2000,
+          system: SYSTEM_PROMPT,
+          tools: [{ type: "web_search_20250305", name: "web_search" }],
+          messages: apiMessages
         })
       });
 
-      const rawText = await res.text();
-      let data;
-      try { data = JSON.parse(rawText); } catch {
-        setMessages([...newMessages, { role: "assistant", content: `Parse error: ${rawText}` }]);
+      const data = await res.json();
+      console.log("RESPONSE:", data);
+
+      if (data.error) {
+        setMessages([...newMessages, { role: "assistant", content: `Error: ${data.error.message}` }]);
         setLoading(false);
+        setStatusText("");
         return;
       }
 
-      if (data.error) {
-        setMessages([...newMessages, { role: "assistant", content: `API Error: ${data.error.message}` }]);
-      } else {
-        const reply = data.choices?.[0]?.message?.content || "No reply received.";
-        setMessages([...newMessages, { role: "assistant", content: reply }]);
+      // Handle tool use loop
+      let finalMessages = [...apiMessages];
+      let currentData = data;
+
+      while (currentData.stop_reason === "tool_use") {
+        setStatusText("Reading search results...");
+        const toolUseBlock = currentData.content.find(b => b.type === "tool_use");
+        if (!toolUseBlock) break;
+
+        // Add assistant's tool use to messages
+        finalMessages.push({ role: "assistant", content: currentData.content });
+
+        // Add tool result
+        finalMessages.push({
+          role: "user",
+          content: [{
+            type: "tool_result",
+            tool_use_id: toolUseBlock.id,
+            content: toolUseBlock.input?.query
+              ? `Search results for: ${toolUseBlock.input.query}`
+              : "Search completed."
+          }]
+        });
+
+        // Follow up call
+        setStatusText("Composing answer...");
+        const res2 = await fetch("https://api.anthropic.com/v1/messages", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            "x-api-key": API_KEY,
+            "anthropic-version": "2023-06-01",
+            "anthropic-dangerous-direct-browser-access": "true"
+          },
+          body: JSON.stringify({
+            model: "claude-3-5-sonnet-20241022",
+            max_tokens: 2000,
+            system: SYSTEM_PROMPT,
+            tools: [{ type: "web_search_20250305", name: "web_search" }],
+            messages: finalMessages
+          })
+        });
+        currentData = await res2.json();
       }
+
+      // Extract final text response
+      const reply = currentData.content
+        ?.filter(b => b.type === "text")
+        .map(b => b.text)
+        .join("\n") || "No reply received.";
+
+      setMessages([...newMessages, { role: "assistant", content: reply }]);
+
     } catch (err) {
+      console.error("FETCH ERROR:", err);
       setMessages([...newMessages, { role: "assistant", content: `Network Error: ${err.message}` }]);
     }
 
     setLoading(false);
+    setStatusText("");
     inputRef.current?.focus();
   }
 
@@ -112,7 +169,6 @@ export default function Chatbot() {
         * { box-sizing: border-box; margin: 0; padding: 0; }
         @keyframes bounce { 0%,80%,100%{transform:translateY(0)} 40%{transform:translateY(-6px)} }
         @keyframes fadeUp { from{opacity:0;transform:translateY(8px)} to{opacity:1;transform:translateY(0)} }
-        @keyframes fadeIn { from{opacity:0} to{opacity:1} }
         ::-webkit-scrollbar { width: 5px; }
         ::-webkit-scrollbar-track { background: transparent; }
         ::-webkit-scrollbar-thumb { background: #d6c9b6; border-radius: 10px; }
@@ -142,12 +198,18 @@ export default function Chatbot() {
             AI Assistant
           </div>
           <div style={{ fontFamily: "'DM Sans', sans-serif", fontSize: 11, color: "#a89880", letterSpacing: "0.05em" }}>
-            Powered by OpenRouter
+            Powered by Claude · Web Search Enabled
           </div>
         </div>
         <div style={{ marginLeft: "auto", display: "flex", alignItems: "center", gap: 6 }}>
-          <div style={{ width: 7, height: 7, borderRadius: "50%", background: "#4ade80", boxShadow: "0 0 6px #4ade80" }} />
-          <span style={{ fontFamily: "'DM Sans', sans-serif", fontSize: 12, color: "#6b7280" }}>Online</span>
+          <div style={{
+            width: 7, height: 7, borderRadius: "50%",
+            background: loading ? "#facc15" : "#4ade80",
+            boxShadow: loading ? "0 0 6px #facc15" : "0 0 6px #4ade80"
+          }} />
+          <span style={{ fontFamily: "'DM Sans', sans-serif", fontSize: 12, color: "#6b7280" }}>
+            {loading ? statusText : "Online"}
+          </span>
         </div>
       </div>
 
@@ -176,7 +238,8 @@ export default function Chatbot() {
               boxShadow: msg.role === "user"
                 ? "0 4px 16px rgba(44,36,22,0.2)"
                 : "0 2px 12px rgba(0,0,0,0.07)",
-              border: msg.role === "assistant" ? "1px solid #ede8e0" : "none"
+              border: msg.role === "assistant" ? "1px solid #ede8e0" : "none",
+              whiteSpace: "pre-wrap"
             }}>
               {msg.content}
             </div>
@@ -192,6 +255,12 @@ export default function Chatbot() {
               boxShadow: "0 2px 12px rgba(0,0,0,0.07)"
             }}>
               <TypingIndicator />
+              {statusText && (
+                <div style={{
+                  fontFamily: "'DM Sans', sans-serif",
+                  fontSize: 12, color: "#a89880", marginTop: 6
+                }}>{statusText}</div>
+              )}
             </div>
           </div>
         )}
@@ -211,10 +280,7 @@ export default function Chatbot() {
           background: "#f9f6f1",
           border: "1.5px solid #ede8e0",
           borderRadius: 16, padding: "10px 14px",
-          transition: "border-color 0.2s",
-        }}
-          onFocus={() => {}}
-        >
+        }}>
           <textarea
             ref={el => { inputRef.current = el; textareaRef.current = el; }}
             rows={1}
@@ -230,7 +296,7 @@ export default function Chatbot() {
                 sendMessage();
               }
             }}
-            placeholder="Message AI Assistant..."
+            placeholder="Ask me anything — I'll search the web for answers..."
             style={{
               flex: 1, color: "#2c2416",
               fontFamily: "'DM Sans', sans-serif",
@@ -246,14 +312,11 @@ export default function Chatbot() {
             style={{
               width: 36, height: 36, borderRadius: 10, flexShrink: 0,
               background: input.trim() && !loading ? "#c9a96e" : "#d6c9b6",
-              border: "none",
-              color: "#fff", fontSize: 16,
+              border: "none", color: "#fff", fontSize: 16,
               display: "flex", alignItems: "center", justifyContent: "center",
               transition: "all 0.2s", cursor: "pointer"
             }}
-          >
-            ↑
-          </button>
+          >↑</button>
         </div>
         <div style={{
           textAlign: "center", marginTop: 10,
