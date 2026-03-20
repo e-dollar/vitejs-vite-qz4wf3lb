@@ -54,12 +54,11 @@ Each role embodies a unique part of the Ritual cosmic ecosystem:
 COMMUNITY ROLES (in order):
 1. VERIFIED MEMBER — Made it through verification. Welcome hooman!
 2. PLEDGED RITUALIST — Pledged to Ritual. Start of the community journey.
-3. RITTY BITTY — Baby Ritualist, on the right path, recognized, long way to go. Gets access to special channels!
-4. CONVICTION — Long-term loyal member. Invited to EXCLUSIVE Telegram chat!
-5. RITUALIST — The HIGHEST HONOR. Authentically demonstrated commitment to Ritual. The real deal!
-6. RITUALIST MAGE — Ritualist with mage specialization. Creates written content, art or memes that grow the community!
-7. GOLDEN RITUALIST — Super rare, only for REAL leaders.
-8. FORERUNNER — Came from the time before Ritual. OG status!
+3. BITTY — Baby Ritualist, on the right path, recognized, long way to go. Gets access to special channels!
+4. RITUALIST — The HIGHEST HONOR. Authentically demonstrated commitment to Ritual. The real deal!
+5. RITUALIST MAGE — Ritualist with mage specialization. Creates written content, art or memes that grow the community!
+6. RADIANT RITUALIST — Super rare, only for REAL leaders.
+7. FORERUNNER — Came from the time before Ritual. OG status!
 
 NOTIFICATION OPT-IN ROLES:
 - EVENTS — IRL and Online community building events
