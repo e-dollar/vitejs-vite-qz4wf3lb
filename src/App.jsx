@@ -304,14 +304,40 @@ THE RITUAL SYMBOL: (❖,❖)
 - Invite another and grow the chain
 - The longer you hold (❖,❖) in your name, the stronger Ritual becomes!
 
-THE ROLE SYSTEM:
-1. NEW MEMBER — Just joined, welcome hooman!
-2. PLEDGED RITUALIST — First step, you pledged to Ritual
-3. RITTY BITTY — Baby Ritualist, recognized, gets access to special channels
-4. CONVICTION ROLE — Long term loyal, invited to EXCLUSIVE Telegram chat!
-5. LET THE RITUAL BEGIN — The real deal role
-6. GOLDEN RITUALIST — Super rare, only for REAL leaders
-7. RADIANT RITUALIST — The LEGENDS (Meison, Ericgudboy, Whitesocks)
+════════════════════════════════════
+DISCORD ROLE SYSTEM (UPDATED)
+════════════════════════════════════
+Each role embodies a unique part of the Ritual cosmic ecosystem:
+
+COMMUNITY ROLES (in order):
+1. 🆕 VERIFIED MEMBER — Made it through verification. Welcome to the community hooman!
+2. 🙏 PLEDGED RITUALIST — You have pledged to Ritual. The start of your community journey.
+3. 👶 RITTY BITTY — Little baby Ritualist, on the right path, recognized but long way to go. Gets access to special channels!
+4. 💜 CONVICTION — Long-term, loyal community member with conviction for what we are building. Invited to an EXCLUSIVE Telegram chat!
+5. ⚡ RITUALIST — The HIGHEST HONOR in the community. You have authentically demonstrated your commitment to Ritual. The real deal!
+6. 🧙 RITUALIST MAGE — A Ritualist with mage specialization. Mages create written content, conjure art or memes that grow the community. Special!
+7. 🏆 GOLDEN RITUALIST — Super rare, only for REAL leaders.
+8. 🌟 FORERUNNER — Came from the time before Ritual. OG status!
+
+NOTIFICATION OPT-IN ROLES:
+- EVENTS — IRL and Online community building events
+- DEV EVENTS — IRL and Online developer workshop events
+- ANNOUNCEMENTS — Official announcements from Ritual Foundation, Ritual Labs, and project leaders
+- DEV UPDATES — Updates for the developer community
+- COMMUNITY UPDATES — Updates for the Ritual community
+
+BLESSINGS & CURSES SYSTEM (COMMUNITY MAGIC!):
+- Both Blessings AND Curses provide value in the community
+- "To bless is to curse, to curse is to bless — embrace the Ritual, for fate is woven in both"
+- "Forever blessed, always cursed, Ritual"
+
+COMMUNITY MAGIC COMMANDS:
+- /bless — Give a friend a blessing ✨
+- /curse — Give a friend a curse 😈
+- /stats — See your stats 📊
+- ?confess — Use #confessions channel to confess your sins 🙏
+- ?sacrifice — Sacrifice your curses to receive an omen 🔮
+- ?oracle — Spend your blessings to call forth a message from beyond 🌌
 
 NOMINATION SYSTEM (NEW!):
 - Community members can nominate others for role ascension via nomination channel
